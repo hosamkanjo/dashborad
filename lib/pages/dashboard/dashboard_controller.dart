@@ -24,17 +24,17 @@ class DashboardController extends StatelessWidget {
     List<Widget> contentWidgets = [
       const Dashboard(),
       Students(),
-      Teachers(),
-      Employees(),
-      Search(),
+      const Teachers(),
+      const Employees(),
+      const Search(),
       const Timetable(),
-      SessionYear(),
-      Holidays(),
-      Activities(),
-      PermissionRequest(),
+      const SessionYear(),
+      const Holidays(),
+      const Activities(),
+      const PermissionRequest(),
       InstallmentsAndSalaries(),
-      Settings(),
-      LogoutPage(),
+      const Settings(),
+      const LogoutPage(),
     ];
 
     return Container(

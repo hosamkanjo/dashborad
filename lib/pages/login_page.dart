@@ -1,4 +1,6 @@
+import 'package:dashboard/models/logiin_model.dart';
 import 'package:dashboard/pages/home_page.dart';
+import 'package:dashboard/services/auth_service..dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -9,7 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController email = TextEditingController();
+  final TextEditingController username = TextEditingController();
   final TextEditingController password = TextEditingController();
   bool _obscureText = true;
   @override
@@ -29,46 +31,64 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     'Welcome to control panel',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 25),
                   const Text(
-                    'Enter Your email and password please !',
+                    'Enter Your username and password please !',
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   const SizedBox(height: 25),
                   TextField(
-                    controller: email,
+                    controller: username,
                     decoration: InputDecoration(
-                        hintText: "Email",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16.0)),
-                        fillColor: Colors.white,
-                        filled: true),
+                      hintText: "Username",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                    ),
                   ),
                   const SizedBox(height: 25),
                   TextField(
                     controller: password,
-                    maxLength: 8,
+                    maxLength: 16,
                     decoration: InputDecoration(
-                        hintText: "Password",
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16.0)),
-                        fillColor: Colors.white,
-                        filled: true,
-                        suffixIcon: togglePassword()),
+                      hintText: "Password",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                      suffixIcon: togglePassword(),
+                    ),
                     obscureText: _obscureText,
                   ),
                   const SizedBox(height: 25),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        bool isLogged = await AuthService().login(
+                          loginInfo: LoginModel(
+                            username: username.text,
+                            password: password.text,
+                          ),
+                        );
+
+                        if (isLogged) {
+                          Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomePage()));
+                            MaterialPageRoute(builder: (context) => HomePage()),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('check your information')),
+                          );
+                        }
                       },
                       child: const Text("Login"),
                     ),
@@ -84,7 +104,8 @@ class _LoginPageState extends State<LoginPage> {
                 color: Color(0xff4B70F5),
                 image: DecorationImage(
                   image: AssetImage(
-                      'assets/ChatGPT Image May 25, 2025, 12_36_37 PM.png'),
+                    'assets/ChatGPT Image May 25, 2025, 12_36_37 PM.png',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -97,13 +118,14 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget togglePassword() {
     return IconButton(
-        onPressed: () {
-          setState(() {
-            _obscureText = !_obscureText;
-          });
-        },
-        icon: _obscureText
-            ? const Icon(Icons.visibility)
-            : const Icon(Icons.visibility_off));
+      onPressed: () {
+        setState(() {
+          _obscureText = !_obscureText;
+        });
+      },
+      icon: _obscureText
+          ? const Icon(Icons.visibility)
+          : const Icon(Icons.visibility_off),
+    );
   }
 }

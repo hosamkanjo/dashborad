@@ -95,7 +95,7 @@ class SideBar extends StatelessWidget {
           selected: false,
           onTap: () => showDialog(
             context: context,
-            builder: (context) => LogoutPage(),
+            builder: (context) => const LogoutPage(),
           ),
         ),
       );

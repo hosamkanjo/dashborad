@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 
 class InstallmentsAndSalaries extends StatefulWidget {
+  const InstallmentsAndSalaries({super.key});
+
   @override
   State<InstallmentsAndSalaries> createState() =>
       _InstallmentsAndSalariesState();
@@ -74,8 +76,9 @@ class _InstallmentsAndSalariesState extends State<InstallmentsAndSalaries>
     if (_employeeNameController.text.isEmpty ||
         _selectedTeacherOrEmployee == null ||
         _salaryAmountController.text.isEmpty ||
-        _salaryDate == null)
+        _salaryDate == null) {
       return;
+    }
 
     setState(() {
       _salaries.add({
@@ -97,8 +100,9 @@ class _InstallmentsAndSalariesState extends State<InstallmentsAndSalaries>
         _selectedClass == null ||
         _selectedSection == null ||
         _feeAmountController.text.isEmpty ||
-        _date == null)
+        _date == null) {
       return;
+    }
 
     setState(() {
       _installments.add({
@@ -204,7 +208,7 @@ class _InstallmentsAndSalariesState extends State<InstallmentsAndSalaries>
                 ElevatedButton(
                   onPressed: _submitSalary,
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
+                    backgroundColor: WidgetStateProperty.all(
                       const Color(0xff4B70F5),
                     ),
                   ),
@@ -329,7 +333,7 @@ class _InstallmentsAndSalariesState extends State<InstallmentsAndSalaries>
                 ElevatedButton(
                   onPressed: _submitFee,
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
+                    backgroundColor: WidgetStateProperty.all(
                       const Color(0xff4B70F5),
                     ),
                   ),

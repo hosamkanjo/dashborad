@@ -41,11 +41,14 @@ class _ActivitiesState extends State<Activities> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text("Create Activity",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff4B70F5))),
+                    child: Text(
+                      "Create Activity",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff4B70F5),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 30),
                   TextField(
@@ -68,8 +71,10 @@ class _ActivitiesState extends State<Activities> {
                     child: ElevatedButton(
                       onPressed: addActivity,
                       style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(
-                              const Color(0xff4B70F5))),
+                        backgroundColor: WidgetStateProperty.all(
+                          const Color(0xff4B70F5),
+                        ),
+                      ),
                       child: const Text('Submit'),
                     ),
                   ),
@@ -86,11 +91,14 @@ class _ActivitiesState extends State<Activities> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text("List of Activities",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff4B70F5))),
+                    child: Text(
+                      "List of Activities",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff4B70F5),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   SingleChildScrollView(
@@ -105,20 +113,28 @@ class _ActivitiesState extends State<Activities> {
                       rows: activities
                           .asMap()
                           .entries
-                          .map((entry) => DataRow(cells: [
+                          .map(
+                            (entry) => DataRow(
+                              cells: [
                                 DataCell(Text((entry.key + 1).toString())),
                                 DataCell(Text(entry.value['name']!)),
                                 DataCell(Text(entry.value['date']!)),
-                                DataCell(IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    setState(() {
-                                      activities.removeAt(entry.key);
-                                    });
-                                  },
-                                )),
-                              ]))
+                                DataCell(
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        activities.removeAt(entry.key);
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
                           .toList(),
                     ),
                   ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dashboard/counters/student_counter.dart';
 
 class Students extends StatefulWidget {
+  const Students({super.key});
+
   @override
   State<Students> createState() => _AddStudentPageState();
 }
@@ -271,7 +273,7 @@ class _AddStudentPageState extends State<Students> {
   }
 
   Widget _buildImageSection({double? height}) {
-    return Container(
+    return SizedBox(
       height: height,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 115.0),
