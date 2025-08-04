@@ -12,7 +12,7 @@ class AuthService {
     Dio dio = Dio();
     try {
       Response response = await dio.post(
-        'https://dummyjson.com/auth/login',
+        'https://37a3480c151c.ngrok-free.app/api/v1/dashboard/login',
         data: loginInfo.toMap(),
       );
       if (response.statusCode == 200) {

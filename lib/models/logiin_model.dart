@@ -1,24 +1,24 @@
-
 import 'dart:convert';
 
 class LoginModel {
-  final String username;
+  final String email;
   final String password;
-  LoginModel({required this.username, required this.password});
+  LoginModel({required this.email, required this.password});
 
-  LoginModel copyWith({String? username, String? password}) {
+  LoginModel copyWith({String? email, String? password}) {
     return LoginModel(
-      username: username ?? this.username,
+      email: email ?? this.email,
       password: password ?? this.password,
     );
   }
-    Map<String, dynamic> toMap() {
-    return <String, dynamic>{'username': username, 'password': password};
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{'email': email, 'password': password};
   }
 
   factory LoginModel.fromMap(Map<String, dynamic> map) {
     return LoginModel(
-      username: map['username'] as String,
+      email: map['email'] as String,
       password: map['password'] as String,
     );
   }
@@ -29,15 +29,15 @@ class LoginModel {
       LoginModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'LoginModel(username: $username, password: $password)';
+  String toString() => 'LoginModel(email: $email, password: $password)';
 
   @override
   bool operator ==(covariant LoginModel other) {
     if (identical(this, other)) return true;
 
-    return other.username == username && other.password == password;
+    return other.email == email && other.password == password;
   }
 
   @override
-  int get hashCode => username.hashCode ^ password.hashCode;
+  int get hashCode => email.hashCode ^ password.hashCode;
 }

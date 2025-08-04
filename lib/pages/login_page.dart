@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController username = TextEditingController();
+  final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   bool _obscureText = true;
   @override
@@ -43,9 +43,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 25),
                   TextField(
-                    controller: username,
+                    controller: email,
                     decoration: InputDecoration(
-                      hintText: "Username",
+                      hintText: "Email",
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16.0),
                       ),
@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () async {
                         bool isLogged = await AuthService().login(
                           loginInfo: LoginModel(
-                            username: username.text,
+                            email: email.text,
                             password: password.text,
                           ),
                         );
