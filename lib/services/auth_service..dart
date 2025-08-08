@@ -1,32 +1,38 @@
+import 'dart:convert';
+
 import 'package:dashboard/models/logiin_model.dart';
 import 'package:dashboard/main.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 // String token = '';
 
 class AuthService {
- // get storage => null;
- 
-  Future<bool> login({required LoginModel loginInfo}) async {
-    Dio dio = Dio();
-    try {
-      Response response = await dio.post(
-        'https://37a3480c151c.ngrok-free.app/api/v1/dashboard/login',
-        data: loginInfo.toMap(),
-      );
-      if (response.statusCode == 200) {
-        // token = response.data['accessToken'];
+  // get storage => null;
 
-        storage.setString('token', response.data['accessToken']);
-        print(response.data);
-        print(response.data['accessToken']);
+  Future<bool> login({required LoginModel loginInfo}) async {
+    try {
+      print("khaled");
+
+      final response = await http.post(
+        Uri.parse('http://192.168.131.137:8000/api/v1/dashboard/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(loginInfo.toMap()),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        storage.setString('token', data['access_token']);
+        print(data);
+        print(data['access_token']);
+        print(data['message']);
         return true;
       } else {
+        print("Login failed. Status code: ${response.statusCode}");
         return false;
       }
     } catch (e) {
-      print(e);
+      print("Login error: $e");
       return false;
     }
   }
@@ -35,3 +41,33 @@ class AuthService {
   signout() {}
 }
 // 'https://dummyjson.com/auth/login'
+
+/*
+
+
+
+
+
+
+
+
+var headers = {
+  'Content-Type': 'application/json'
+};
+var request = http.Request('POST', Uri.parse('https://37a3480c151c.ngrok-free.app/api/v1/dashboard/login'));
+request.body = json.encode({
+  "email": "khaled@example.com",
+  "password": "password"
+});
+request.headers.addAll(headers);
+
+http.StreamedResponse response = await request.send();
+
+if (response.statusCode == 200) {
+  print(await response.stream.bytesToString());
+}
+else {
+  print(response.reasonPhrase);
+}
+
+ */

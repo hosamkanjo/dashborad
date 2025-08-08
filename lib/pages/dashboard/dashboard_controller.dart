@@ -23,7 +23,7 @@ class DashboardController extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> contentWidgets = [
       const Dashboard(),
-      Students(),
+      const Students(),
       const Teachers(),
       const Employees(),
       const Search(),
@@ -32,7 +32,7 @@ class DashboardController extends StatelessWidget {
       const Holidays(),
       const Activities(),
       const PermissionRequest(),
-      InstallmentsAndSalaries(),
+      const InstallmentsAndSalaries(),
       const Settings(),
       const LogoutPage(),
     ];

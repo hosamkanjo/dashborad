@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 25),
                   const Text(
-                    'Enter Your username and password please !',
+                    'Enter Your Email and password please !',
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   const SizedBox(height: 25),
@@ -82,11 +82,11 @@ class _LoginPageState extends State<LoginPage> {
                         if (isLogged) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
+                            MaterialPageRoute(builder: (context) => const HomePage()),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('check your information')),
+                            const SnackBar(content: Text('check your information')),
                           );
                         }
                       },
