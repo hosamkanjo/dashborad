@@ -6,7 +6,7 @@ late SharedPreferences storage;
 Future<void> main() async {
   storage = await SharedPreferences.getInstance();
   runApp(const MyApp());
-}
+}  
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

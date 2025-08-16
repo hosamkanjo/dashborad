@@ -15,13 +15,14 @@ class AuthService {
       print("khaled");
 
       final response = await http.post(
-        Uri.parse('http://192.168.131.137:8000/api/v1/dashboard/login'),
+        Uri.parse('http://localhost:8000/api/v1/dashboard/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(loginInfo.toMap()),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
         storage.setString('token', data['access_token']);
         print(data);
         print(data['access_token']);
@@ -36,6 +37,8 @@ class AuthService {
       return false;
     }
   }
+
+  
 
   signup() {}
   signout() {}
