@@ -150,7 +150,7 @@ class LogoutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  '_ Are you sure you want to logout ?',
+                  ' Are you sure you want to logout ?',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Color(0xff4B70F5)),
                 ),
@@ -198,109 +198,3 @@ class LogoutPage extends StatelessWidget {
 
 
 
-
-
-
-
-
-
-
-// import 'package:dashboard/pages/login_page.dart';
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http; // <-- لإرسال الطلب للسيرفر
-// import 'dart:convert'; // <-- لتحويل الرد من JSON
-
-// class LogoutPage extends StatelessWidget {
-//   const LogoutPage({super.key});
-
-//   /// دالة تنفيذ طلب الخروج
-//   Future<void> _logout(BuildContext context) async {
-//     try {
-//       final response = await http.post(
-//         Uri.parse('http://localhost:8000/api/v1/dashboard/logout'),
-//         headers: {
-//           'Content-Type': 'application/json',
-//           // إذا السيرفر يحتاج توكن حطّه هنا
-//           // 'Authorization': 'Bearer YOUR_TOKEN',
-//         },
-//       );
-
-//       if (response.statusCode == 200) {
-//         final data = json.decode(response.body);
-
-//         // عرض رسالة من السيرفر
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text(data["message"] ?? "Logout successful")),
-  
-//         );
-
-//         // الانتقال لصفحة تسجيل الدخول وحذف كل المسارات السابقة
-//         Navigator.pushAndRemoveUntil(
-//           context,
-//           MaterialPageRoute(builder: (context) => const LoginPage()),
-//           (route) => false,
-//         );
-//       } else {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(content: Text("Logout failed: ${response.statusCode}")),
-//         );
-//       }
-//     } catch (e) {
-//       // في حال صار خطأ بالاتصال
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Error: $e")),
-//       );
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Dialog(
-//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-//       child: Stack(
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.all(20.0),
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 const Text(
-//                   'Confirm Logout',
-//                   style: TextStyle(
-//                       fontWeight: FontWeight.bold,
-//                       fontSize: 18,
-//                       color: Color(0xff4B70F5)),
-//                 ),
-//                 const SizedBox(height: 10),
-//                 const Text(
-//                   '_ Are you sure you want to logout ?',
-//                   textAlign: TextAlign.center,
-//                   style: TextStyle(color: Color(0xff4B70F5)),
-//                 ),
-//                 const SizedBox(height: 20),
-//                 ElevatedButton(
-//                   onPressed: () => _logout(context), // استدعاء API
-//                   style: ButtonStyle(
-//                     backgroundColor: WidgetStateProperty.all(
-//                       const Color(0xff4B70F5),
-//                     ),
-//                   ),
-//                   child: const Text('OK'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           Positioned(
-//             right: 0,
-//             child: IconButton(
-//               icon: const Icon(Icons.close),
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+ 
 import 'package:dashboard/models/logiin_model.dart';
 import 'package:dashboard/main.dart';
 import 'package:dio/dio.dart';
@@ -42,6 +42,8 @@ class AuthService {
 
   signup() {}
   signout() {}
+
+  Future logout() async {}
 }
 // 'https://dummyjson.com/auth/login'
 
