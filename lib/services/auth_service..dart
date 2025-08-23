@@ -6,7 +6,8 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 // String token = '';
-
+// url  local base =http://localhost:8000/
+// 
 class AuthService {
   // get storage => null;
 

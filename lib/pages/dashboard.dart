@@ -1,7 +1,7 @@
 import 'package:dashboard/counters/employee_counter.dart';
 import 'package:dashboard/counters/student_counter.dart';
 import 'package:dashboard/counters/teacher_counter.dart';
-import 'package:dashboard/services/dashboard';
+import 'package:dashboard/services/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:fl_chart/fl_chart.dart';
