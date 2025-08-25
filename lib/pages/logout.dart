@@ -69,10 +69,9 @@ class LogoutPage extends StatelessWidget {
 
   Future<void> _performLogout(BuildContext context) async {
     final dio = Dio();
-    const apiUrl = 'http://localhost:8000/api/v1/dashboard/logout';
-
+    const apiUrl = 'http://137.184.50.2/api/v1/dashboard/logout';
   
-    final token = storage.getString('token');
+     final token = storage.getString('token');
     
     if (token == null || token.isEmpty) {
       print(' No token found in storage');

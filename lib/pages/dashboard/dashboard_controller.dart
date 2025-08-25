@@ -1,6 +1,6 @@
 import 'package:dashboard/pages/activities.dart';
 import 'package:dashboard/pages/dashboard.dart';
-import 'package:dashboard/pages/employees.dart';
+import 'package:dashboard/pages/supervisor.dart';
 import 'package:dashboard/pages/holidays.dart';
 import 'package:dashboard/pages/installments_and_salaries.dart';
 import 'package:dashboard/pages/logout.dart';
@@ -23,9 +23,9 @@ class DashboardController extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> contentWidgets = [
       const Dashboard(),
-      const Students(),
+      Students(),
       const Teachers(),
-      const Employees(),
+      const Supervisors(),
       const Search(),
       const Timetable(),
       const SessionYear(),

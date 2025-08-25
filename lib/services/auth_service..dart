@@ -1,5 +1,4 @@
 import 'dart:convert';
- 
 import 'package:dashboard/models/logiin_model.dart';
 import 'package:dashboard/main.dart';
 import 'package:dio/dio.dart';
@@ -16,7 +15,7 @@ class AuthService {
       print("khaled");
 
       final response = await http.post(
-        Uri.parse('http://localhost:8000/api/v1/dashboard/login'),
+        Uri.parse('http://137.184.50.2/api/v1/dashboard/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(loginInfo.toMap()),
       );
@@ -50,7 +49,7 @@ class AuthService {
 
 /*
 
-
+// http://137.184.50.2/
 
 
 

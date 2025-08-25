@@ -69,7 +69,7 @@ class SideBar extends StatelessWidget {
       ("Home", Icons.home),
       ("Students", Icons.person_add),
       ("Teachers", Icons.school),
-      ("Employees", Icons.person_add_outlined),
+      ("Supervisor", Icons.person_add_outlined),
       ("Search", Icons.search),
       ("Timetable", Icons.schedule),
       ("Session year", Icons.calendar_today),

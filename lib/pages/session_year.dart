@@ -133,7 +133,7 @@
 //                     .entries
 //                     .map((entry) => DataRow(cells: [
 //                           DataCell(Text((entry.key + 1).toString())),
-//                           DataCell(Text(entry.value['name']!)),
+//                           DataCell(Text(entry.v alue['name']!)),
 //                           DataCell(Text(entry.value['startDate']!)),
 //                           DataCell(Text(entry.value['endDate']!)),
 //                           DataCell(Row(
@@ -183,15 +183,17 @@ class _SessionYearState extends State<SessionYear> {
   late Dio _dio;
   bool isLoading = false;
 
+  // استبدل هذا بالقيمة الفعلية للتوكن
   final authToken = storage.getString('token');
 
   @override
   void initState() {
     super.initState();
 
+    // إعداد Dio مع التوكن في الرؤوس
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'http://localhost:8000/api/v1/dashboard/years/',
+        baseUrl: 'http://137.184.50.2/api/v1/dashboard/years',
         headers: {
           'Authorization': 'Bearer $authToken',
           'Content-Type': 'application/json',
@@ -208,13 +210,8 @@ class _SessionYearState extends State<SessionYear> {
       isLoading = true;
     });
 
-      
-
     try {
-      final response = await _dio.post('');
-     print(' Response Status: ${response.statusCode}');
-      print(' Response Data: ${response.data}');
-
+      final response = await _dio.get('');
       if (response.statusCode == 200) {
         setState(() {
           sessionYears.clear();
@@ -251,6 +248,7 @@ class _SessionYearState extends State<SessionYear> {
     }
   }
 
+  // إضافة سنة دراسية جديدة
   Future<void> addSessionYear() async {
     final name = nameController.text.trim();
     final startDate = startDateController.text.trim();
@@ -266,10 +264,11 @@ class _SessionYearState extends State<SessionYear> {
           '',
           data: {'name': name, 'start_date': startDate, 'end_date': endDate},
         );
-print(' Response Status: ${response.statusCode}');
-      print(' Response Data: ${response.data}');
-
+        print(response.requestOptions);
+        print(response.statusCode);
+        print(response.data);
         if (response.statusCode == 200 || response.statusCode == 201) {
+          // إضافة السنة الجديدة إلى القائمة
           setState(() {
             sessionYears.add({
               'id': response.data['id'],
@@ -280,6 +279,8 @@ print(' Response Status: ${response.statusCode}');
               'updated_at': response.data['updated_at'],
             });
           });
+
+          // مسح الحقول بعد الإضافة
           nameController.clear();
           startDateController.clear();
           endDateController.clear();
@@ -314,7 +315,7 @@ print(' Response Status: ${response.statusCode}');
     }
   }
 
-
+  // حذف سنة دراسية
   Future<void> deleteSessionYear(int id, int index) async {
     setState(() {
       isLoading = true;
@@ -356,6 +357,7 @@ print(' Response Status: ${response.statusCode}');
     }
   }
 
+  // دالة مساعدة لعرض أخطاء
   void showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -439,7 +441,7 @@ print(' Response Status: ${response.statusCode}');
                         border: OutlineInputBorder(),
                       ),
                       onTap: () async {
-                     
+                        // يمكن إضافة منتقي تواريخ هنا
                       },
                     ),
                   ),
@@ -526,8 +528,6 @@ print(' Response Status: ${response.statusCode}');
                                     DataCell(
                                       Row(
                                         children: [
-
-
                                           IconButton(
                                             icon: const Icon(
                                               Icons.delete,
@@ -540,8 +540,6 @@ print(' Response Status: ${response.statusCode}');
                                                     entry.key,
                                                   ),
                                           ),
-
-
                                         ],
                                       ),
                                     ),
@@ -557,6 +555,7 @@ print(' Response Status: ${response.statusCode}');
         ),
         if (isLoading)
           Container(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.3),
             child: const Center(child: CircularProgressIndicator()),
           ),

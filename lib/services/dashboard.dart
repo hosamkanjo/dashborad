@@ -5,7 +5,7 @@ class DashboardService {
   final Dio _dio = Dio();
 
   Future<Map<String, dynamic>> fetchDashboardData() async {
-    const apiUrl = 'http://localhost:8000/api/v1/dashboard/home';
+    const apiUrl = 'http://137.184.50.2/api/v1/dashboard/home';
       final token = storage.getString('token');
     try {
       final response = await _dio.get
