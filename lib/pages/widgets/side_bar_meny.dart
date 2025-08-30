@@ -73,11 +73,9 @@ class SideBar extends StatelessWidget {
       ("Search", Icons.search),
       ("Timetable", Icons.schedule),
       ("Session year", Icons.calendar_today),
-      ("Holidays", Icons.beach_access),
-      ("Activities", Icons.sports),
-      ("Permission Requests", Icons.check_circle),
-      ("Installments/salaries", Icons.attach_money),
-      ("Settings", Icons.settings),
+
+      // ("Permission Requests", Icons.check_circle),
+      // ("Settings", Icons.settings),
     ];
 
     return List.generate(menuItems.length, (index) {

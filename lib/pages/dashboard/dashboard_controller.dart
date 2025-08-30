@@ -1,10 +1,8 @@
-import 'package:dashboard/pages/activities.dart';
+
 import 'package:dashboard/pages/dashboard.dart';
 import 'package:dashboard/pages/supervisor.dart';
-import 'package:dashboard/pages/holidays.dart';
-import 'package:dashboard/pages/installments_and_salaries.dart';
 import 'package:dashboard/pages/logout.dart';
-import 'package:dashboard/pages/permission_requests.dart';
+
 import 'package:dashboard/pages/search.dart';
 import 'package:dashboard/pages/session_year.dart';
 import 'package:dashboard/pages/settings.dart';
@@ -27,13 +25,13 @@ class DashboardController extends StatelessWidget {
       const Teachers(),
       const Supervisors(),
       const Search(),
-      const Timetable(),
+       ScheduleInitializer(),
       const SessionYear(),
-      const Holidays(),
-      const Activities(),
-      const PermissionRequest(),
-      const InstallmentsAndSalaries(),
-      const Settings(),
+      // const Holidays(),
+      // const Activities(),
+      // const PermissionRequest(),
+      // const InstallmentsAndSalaries(),
+      // const Settings(),
       const LogoutPage(),
     ];
 

@@ -542,8 +542,8 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       const SizedBox(width: 20),
                       _buildCounterCard(
-                        title: 'Total Employees :',
-                        value: data['total_employees'],
+                        title: 'Total Supervisors :',
+                        value: data['total_supervisors'],
                         icon: Icons.work,
                         backgroundColor: const Color(0xff4B70F5),
                       ),

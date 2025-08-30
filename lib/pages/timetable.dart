@@ -1,404 +1,595 @@
+
+
+import 'dart:convert';
+import 'package:dashboard/main.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class Timetable extends StatefulWidget {
-  const Timetable({super.key});
-
+class ScheduleInitializer extends StatefulWidget {
   @override
-  State<Timetable> createState() => _TimetablePageState();
+  _ScheduleInitializerState createState() => _ScheduleInitializerState();
 }
 
-class _TimetablePageState extends State<Timetable> {
-  final List<String> days = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-  ];
-  final int lessonsPerDay = 6;
+class _ScheduleInitializerState extends State<ScheduleInitializer> {
 
-  String selectedClass = '';
-  String selectedSection = '';
+  final List<Teacher> _teachers = [];
+  final List<Classroom> _classrooms = [];
+  final List<Period> _periods = [];
 
-  List<String> availableClasses = [
-    'Class 1',
-    'Class 2',
-    'Class 3',
-    'Class 4',
-    'Class 5',
-    'Class 6',
-    'Class 7',
-    'Class 8',
-    'Class 9',
-    'Class 10',
-    'Class 11',
-    'Class 12',
-  ];
-  List<String> availableSections = ['Section 1', 'Section 2', 'Section 3'];
-  List<String> subjects = [
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Science',
-    'English',
-    'Arabic',
-    'France',
-    'Art',
-    'Music',
-  ];
+ 
+  final List<TeacherAvailability> teacherAvailabilities = [];
+  final List<ClassroomSchedule> classrooms = [];
 
-  Map<String, List<String>> schedule = {};
-  List<Map<String, dynamic>> savedSchedules = [];
+  bool _loading = true;
+  String? _loadError;
+
+  final List<String> daysOfWeek = const [
+    'saturday',
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+  ];
 
   @override
   void initState() {
     super.initState();
-    for (var day in days) {
-      schedule[day] = List.filled(lessonsPerDay, '');
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
+    try {
+      await Future.wait([
+        _fetchTeachers(),
+        _fetchPeriods(),
+        _fetchClassrooms(),
+      ]);
+    } catch (e) {
+      _loadError = e.toString();
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
-  void saveSchedule() {
-    if (selectedClass.isEmpty || selectedSection.isEmpty) return;
-    setState(() {
-      savedSchedules.add({
-        'class': selectedClass,
-        'section': selectedSection,
-        'schedule': Map.from(schedule),
-      });
-      // Reset
-      selectedClass = '';
-      selectedSection = '';
-      for (var day in days) {
-        schedule[day] = List.filled(lessonsPerDay, '');
-      }
-    });
+  Map<String, String> _authHeaders() {
+    final token = storage.getString('token');
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
   }
 
-  void deleteSchedule(int index) {
-    setState(() {
-      savedSchedules.removeAt(index);
-    });
+  Future<void> _fetchTeachers() async {
+    final url = Uri.parse('http://137.184.50.2/api/v1/dashboard/teacher');
+    final res = await http.get(url, headers: _authHeaders());
+         print(' Response Status: ${res.statusCode}');
+      print(' Response Data: ${res.body}');
+    if (res.statusCode != 200) {
+      throw Exception('Failed to load teachers (${res.statusCode})');
+    }
+    final data = jsonDecode(res.body);
+    // Expecting list of teachers under data or the body itself depending on API
+    final List list = data is Map && data['data'] != null ? data['data'] : (data as List);
+    _teachers
+      ..clear()
+      ..addAll(list.map((e) => Teacher(
+            id: e['id'] is int ? e['id'] : int.tryParse('${e['id']}') ?? 0,
+            name: e['name']?.toString() ?? '—',
+          )));
+  }
+  
+
+  Future<void> _fetchPeriods() async {
+    final url = Uri.parse('http://137.184.50.2/api/v1/dashboard/schedule/periods');
+    
+    final res = await http.get(url, headers: _authHeaders());
+       print(' Response Status: ${res.statusCode}');
+      print(' Response Data: ${res.body}');
+    if (res.statusCode != 200) {
+      throw Exception('Failed to load periods (${res.statusCode})');
+    }
+    final data = jsonDecode(res.body);
+    final List list = data is Map && data['data'] != null ? data['data'] : (data as List);
+    _periods
+      ..clear()
+      ..addAll(list.map((e) => Period(
+            id: e['id'] is int ? e['id'] : int.tryParse('${e['id']}') ?? 0,
+            name: e['name']?.toString() ?? '—',
+          )));
+  }
+
+  Future<void> _fetchClassrooms() async {
+    final url = Uri.parse('http://137.184.50.2/api/v1/dashboard/classrooms');
+    final res = await http.get(url, headers: _authHeaders());
+       print(' Response Status: ${res.statusCode}');
+      print(' Response Data: ${res.body}');
+    if (res.statusCode != 200) {
+      throw Exception('Failed to load classrooms (${res.statusCode})');
+    }
+    final data = jsonDecode(res.body);
+    final List list = data is Map && data['data'] != null ? data['data'] : (data as List);
+    _classrooms
+      ..clear()
+      ..addAll(list.map((e) => Classroom(
+            id: e['id'] is int ? e['id'] : int.tryParse('${e['id']}') ?? 0,
+            name: e['name']?.toString() ?? '—',
+          )));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
+      appBar: AppBar(
+        title: const Text('Weekly Schedule Initialization', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xff4B70F5),
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            onPressed: _loading ? null : _bootstrap,
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reload lists',
+          ),
+        ],
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _loadError != null
+              ? _ErrorState(message: _loadError!, onRetry: _bootstrap)
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTeacherAvailabilitySection(),
+                      const SizedBox(height: 24),
+                      _buildClassroomScheduleSection(),
+                      const SizedBox(height: 24),
+                      _buildSubmitButton(),
+                    ],
+                  ),
+                ),
+    );
+  }
+
+
+  Widget _buildTeacherAvailabilitySection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xff4B70F5), width: 2),
+      ),
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(
-                child: Text(
-                  'Create Weekly Timetable',
-                  style: TextStyle(
-                    color: Color(0xff4B70F5),
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            const Text('Teacher Availability',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xff4B70F5))),
+            const SizedBox(height: 16),
+            ...teacherAvailabilities.asMap().entries.map((entry) {
+              final index = entry.key;
+              final availability = entry.value;
+              return _buildTeacherAvailabilityItem(availability, index);
+            }),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _teachers.isEmpty || _periods.isEmpty ? null : _addTeacherAvailability,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff4B70F5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('Add Teacher'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherAvailabilityItem(TeacherAvailability availability, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xff4B70F5).withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<int>(
+                  value: availability.teacherId,
+                  decoration: InputDecoration(
+                    labelText: 'Teacher',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                   ),
+                  items: _teachers.map((t) => DropdownMenuItem<int>(value: t.id, child: Text(t.name))).toList(),
+                  onChanged: (value) => setState(() => availability.teacherId = value!),
                 ),
               ),
-            ),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                hintText: 'Select Class',
-                hintStyle: TextStyle(color: Color(0xff4B70F5)),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _removeTeacherAvailability(index),
               ),
-              value: selectedClass.isNotEmpty ? selectedClass : null,
-              items: availableClasses
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  selectedClass = val ?? '';
-                });
-              },
+            ],
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: availability.dayOfWeek,
+            decoration: InputDecoration(
+              labelText: 'Day',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                hintText: 'Select Section',
-                hintStyle: TextStyle(color: Color(0xff4B70F5)),
+            items: daysOfWeek
+                .map((day) => DropdownMenuItem<String>(value: day, child: Text(_getEnglishDayName(day))))
+                .toList(),
+            onChanged: (value) => setState(() => availability.dayOfWeek = value!),
+          ),
+          const SizedBox(height: 12),
+          const Text('Available Periods:', style: TextStyle(fontWeight: FontWeight.bold)),
+          Wrap(
+            spacing: 8,
+            children: _periods.map((p) {
+              final isSelected = availability.periodIds.contains(p.id);
+              return FilterChip(
+                label: Text(p.name),
+                selected: isSelected,
+                onSelected: (selected) {
+                  setState(() {
+                    if (selected) {
+                      availability.periodIds.add(p.id);
+                    } else {
+                      availability.periodIds.remove(p.id);
+                    }
+                  });
+                },
+                selectedColor: const Color(0xff4B70F5),
+                checkmarkColor: Colors.white,
+                labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClassroomScheduleSection() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xff4B70F5), width: 2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Classroom Schedule',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xff4B70F5))),
+            const SizedBox(height: 16),
+            ...classrooms.asMap().entries.map((entry) {
+              final index = entry.key;
+              final classroom = entry.value;
+              return _buildClassroomScheduleItem(classroom, index);
+            }),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _classrooms.isEmpty ? null : _addClassroomSchedule,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff4B70F5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              value: selectedSection.isNotEmpty ? selectedSection : null,
-              items: availableSections
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  selectedSection = val ?? '';
-                });
-              },
+              child: const Text('Add Classroom'),
             ),
-            const SizedBox(height: 20),
-            ...days.map(
-              (day) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClassroomScheduleItem(ClassroomSchedule classroom, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xff4B70F5).withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<int>(
+                  value: classroom.classroomId,
+                  decoration: InputDecoration(
+                    labelText: 'Classroom',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  items: _classrooms
+                      .map((c) => DropdownMenuItem<int>(value: c.id, child: Text(c.name)))
+                      .toList(),
+                  onChanged: (value) => setState(() => classroom.classroomId = value!),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _removeClassroomSchedule(index),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text('Periods per Day:', style: TextStyle(fontWeight: FontWeight.bold)),
+          ...daysOfWeek.map((day) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
                 children: [
-                  Text(
-                    day,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(flex: 2, child: Text(_getEnglishDayName(day))),
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      initialValue: classroom.periodsPerDay[day]?.toString() ?? '0',
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                      ),
+                      onChanged: (value) {
+                        classroom.periodsPerDay[day] = int.tryParse(value) ?? 0;
+                      },
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  ...List.generate(lessonsPerDay, (i) {
-                    return Row(
-                      children: [
-                        Text(
-                          'Lesson ${i + 1}:',
-                          style: const TextStyle(color: Color(0xff4B70F5)),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: schedule[day]![i].isNotEmpty
-                                ? schedule[day]![i]
-                                : null,
-                            hint: const Text(
-                              'Select Subject',
-                              style: TextStyle(color: Color(0xff4B70F5)),
-                            ),
-                            items: subjects
-                                .map(
-                                  (s) => DropdownMenuItem(
-                                    value: s,
-                                    child: Text(s),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                schedule[day]![i] = val ?? '';
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-                  const SizedBox(height: 12),
                 ],
               ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return Center(
+      child: ElevatedButton(
+        onPressed: _submitSchedule,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xff4B70F5),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: const Text('Initialize Schedule', style: TextStyle(fontSize: 16)),
+      ),
+    );
+  }
+
+  void _addTeacherAvailability() {
+    if (_teachers.isEmpty) return;
+    setState(() {
+      teacherAvailabilities.add(TeacherAvailability(
+        teacherId: _teachers.first.id,
+        dayOfWeek: daysOfWeek.first,
+        periodIds: <int>[],
+      ));
+    });
+  }
+
+  void _removeTeacherAvailability(int index) {
+    setState(() => teacherAvailabilities.removeAt(index));
+  }
+
+  void _addClassroomSchedule() {
+    if (_classrooms.isEmpty) return;
+    setState(() {
+      classrooms.add(ClassroomSchedule(
+        classroomId: _classrooms.first.id,
+        periodsPerDay: {
+          'saturday': 0,
+          'sunday': 0,
+          'monday': 0,
+          'tuesday': 0,
+          'wednesday': 0,
+          'thursday': 0,
+        },
+      ));
+    });
+  }
+
+  void _removeClassroomSchedule(int index) {
+    setState(() => classrooms.removeAt(index));
+  }
+
+  Future<void> _submitSchedule() async {
+    final url = Uri.parse('http://137.184.50.2/api/v1/dashboard/schedule/initialize-weekly');
+
+    final requestBody = {
+      'teacher_availabilities': teacherAvailabilities.map((availability) {
+        return {
+          'teacher_id': availability.teacherId, 
+          'day_of_week': availability.dayOfWeek,
+          'period_ids': availability.periodIds, 
+        };
+      }).toList(),
+      'classrooms': classrooms.map((classroom) {
+        return {
+          'classroom_id': classroom.classroomId, 
+          'periods_per_day': classroom.periodsPerDay, 
+        };
+      }).toList(),
+    };
+
+    debugPrint('Sending request: ${jsonEncode(requestBody)}');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: _authHeaders(),
+        body: jsonEncode(requestBody),
+      );
+       print(' Response Status: ${response.statusCode}');
+      print(' Response Data: ${response.body}');
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if ((responseData is Map) && responseData['success'] == true) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message']?.toString() ?? 'Success'), backgroundColor: Colors.green),
+          );
+          _showResults(Map<String, dynamic>.from(responseData['data'] as Map));
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(responseData['message']?.toString() ?? 'Failed to initialize schedule'),
+              backgroundColor: Colors.red,
             ),
-            ElevatedButton(
-              onPressed: saveSchedule,
-              child: const Text('Save Schedule'),
-            ),
-            const SizedBox(height: 30),
-            const Divider(),
-            const Text(
-              'Saved Schedules:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            ...savedSchedules.asMap().entries.map((entry) {
-              int index = entry.key;
-              var sched = entry.value;
-              return Card(
-                child: ListTile(
-                  title: Text(
-                    '${sched['class']} - ${sched['section']}',
-                    style: const TextStyle(color: Color(0xff4B70F5)),
-                  ),
-                  subtitle: Text(
-                    sched['schedule'].entries
-                        .map((e) => "${e.key}: ${e.value.join(', ')}")
-                        .join("\n"),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => deleteSchedule(index),
-                  ),
-                ),
-              );
-            }),
+          );
+        }
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Server connection error'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  void _showResults(Map<String, dynamic> data) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Schedule Initialization Results', style: TextStyle(color: Color(0xff4B70F5))),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Teacher Availability Summary:', style: TextStyle(fontWeight: FontWeight.bold)),
+              ...(data['teacher_availability_summary'] as List? ?? const [])
+                  .map((summary) => Text(
+                        'Teacher ${summary['teacher_id']} - ${_getEnglishDayName(summary['day_of_week'])}: ${summary['count']} periods',
+                      ))
+                  .toList(),
+              const SizedBox(height: 16),
+              const Text('Classroom Schedule Summary:', style: TextStyle(fontWeight: FontWeight.bold)),
+              ...(data['section_schedules_summary'] as List? ?? const [])
+                  .map((summary) => Text(
+                        'Classroom ${summary['classroom_id']}: ${summary['sections_count']} sections - ${summary['rows_created']} rows',
+                      ))
+                  .toList(),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Color(0xff4B70F5))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getEnglishDayName(String day) {
+    const dayMap = {
+      'saturday': 'Saturday',
+      'sunday': 'Sunday',
+      'monday': 'Monday',
+      'tuesday': 'Tuesday',
+      'wednesday': 'Wednesday',
+      'thursday': 'Thursday',
+    };
+    return dayMap[day] ?? day;
+  }
+}
+
+// ===== Models =====
+class TeacherAvailability {
+  int teacherId;
+  String dayOfWeek;
+  List<int> periodIds;
+
+  TeacherAvailability({
+    required this.teacherId,
+    required this.dayOfWeek,
+    required this.periodIds,
+  });
+}
+
+class ClassroomSchedule {
+  int classroomId;
+  Map<String, int> periodsPerDay;
+
+  ClassroomSchedule({
+    required this.classroomId,
+    required this.periodsPerDay,
+  });
+}
+
+class Teacher {
+  final int id;
+  final String name;
+  Teacher({required this.id, required this.name});
+}
+
+class Period {
+  final int id;
+  final String name; 
+  Period({required this.id, required this.name});
+}
+
+class Classroom {
+  final int id;
+  final String name;
+  Classroom({required this.id, required this.name});
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
           ],
         ),
       ),
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-
-// class Timetable extends StatefulWidget {
-//   const Timetable({super.key});
-
-//   @override
-//   State<Timetable> createState() => _TimetablePageState();
-// }
-
-// class _TimetablePageState extends State<Timetable> {
-//   final List<String> days = [
-//     'Sunday',
-//     'Monday',
-//     'Tuesday',
-//     'Wednesday',
-//     'Thursday'
-//   ];
-//   final int lessonsPerDay = 5;
-
-//   String selectedClass = '';
-//   List<String> availableClasses = ['Grade 1', 'Grade 2', 'Grade 3'];
-//   List<String> subjects = [
-//     'Mathematics',
-//     'Physics',
-//     'Chemistry',
-//     'Science',
-//     'English',
-//     'Arabic',
-//     'France',
-//     'Art',
-//     'Music'
-//   ];
-
-//   Map<String, List<String>> schedule = {};
-//   List<Map<String, dynamic>> savedSchedules = [];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     for (var day in days) {
-//       schedule[day] = List.filled(lessonsPerDay, '');
-//     }
-//   }
-
-//   void saveSchedule() {
-//     if (selectedClass.isEmpty) return;
-//     setState(() {
-//       savedSchedules.add({
-//         'class': selectedClass,
-//         'schedule': Map.from(schedule),
-//       });
-//       // Reset
-//       selectedClass = '';
-//       for (var day in days) {
-//         schedule[day] = List.filled(lessonsPerDay, '');
-//       }
-//     });
-//   }
-
-//   void deleteSchedule(int index) {
-//     setState(() {
-//       savedSchedules.removeAt(index);
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(16),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             const Padding(
-//               padding: EdgeInsets.all(8.0),
-//               child: Center(
-//                 child: Text('Create Weekly Timetable',
-//                     style: TextStyle(
-//                         color: Color(0xff4B70F5),
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.bold)),
-//               ),
-//             ),
-//             DropdownButtonFormField<String>(
-//               decoration: const InputDecoration(
-//                   hintText: 'Select Class',
-//                   hintStyle: TextStyle(color: Color(0xff4B70F5))),
-//               value: selectedClass.isNotEmpty ? selectedClass : null,
-//               items: availableClasses
-//                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-//                   .toList(),
-//               onChanged: (val) {
-//                 setState(() {
-//                   selectedClass = val ?? '';
-//                 });
-//               },
-//             ),
-//             const SizedBox(height: 20),
-//             ...days.map((day) => Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(day,
-//                         style: const TextStyle(
-//                             fontSize: 18, fontWeight: FontWeight.bold)),
-//                     const SizedBox(height: 8),
-//                     ...List.generate(lessonsPerDay, (i) {
-//                       return Row(
-//                         children: [
-//                           Text(
-//                             'Lesson ${i + 1}:',
-//                             style: const TextStyle(color: Color(0xff4B70F5)),
-//                           ),
-//                           const SizedBox(width: 10),
-//                           Expanded(
-//                             child: DropdownButton<String>(
-//                               isExpanded: true,
-//                               value: schedule[day]![i].isNotEmpty
-//                                   ? schedule[day]![i]
-//                                   : null,
-//                               hint: const Text(
-//                                 'Select Subject',
-//                                 style: TextStyle(color: Color(0xff4B70F5)),
-//                               ),
-//                               items: subjects
-//                                   .map((s) => DropdownMenuItem(
-//                                       value: s, child: Text(s)))
-//                                   .toList(),
-//                               onChanged: (val) {
-//                                 setState(() {
-//                                   schedule[day]![i] = val ?? '';
-//                                 });
-//                               },
-//                             ),
-//                           ),
-//                         ],
-//                       );
-//                     }),
-//                     const SizedBox(height: 12),
-//                   ],
-//                 )),
-//             ElevatedButton(
-//               onPressed: saveSchedule,
-//               child: const Text('Save Schedule'),
-//             ),
-//             const SizedBox(height: 30),
-//             const Divider(),
-//             const Text('Saved Schedules:',
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-//             const SizedBox(height: 10),
-//             ...savedSchedules.asMap().entries.map((entry) {
-//               int index = entry.key;
-//               var sched = entry.value;
-//               return Card(
-//                 child: ListTile(
-//                   title: Text(
-//                     sched['class'],
-//                     style: const TextStyle(color: Color(0xff4B70F5)),
-//                   ),
-//                   subtitle: Text(sched['schedule']
-//                       .entries
-//                       .map((e) => "${e.key}: ${e.value.join(', ')}")
-//                       .join("\n")),
-//                   trailing: IconButton(
-//                     icon: const Icon(Icons.delete, color: Colors.red),
-//                     onPressed: () => deleteSchedule(index),
-//                   ),
-//                 ),
-//               );
-//             }),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

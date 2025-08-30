@@ -4,7 +4,7 @@ import 'package:dashboard/main.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
-// String token = '';
+
 // url  local base =http://localhost:8000/
 // 
 class AuthService {
@@ -12,7 +12,7 @@ class AuthService {
 
   Future<bool> login({required LoginModel loginInfo}) async {
     try {
-      print("khaled");
+      //print("khaled");
 
       final response = await http.post(
         Uri.parse('http://137.184.50.2/api/v1/dashboard/login'),

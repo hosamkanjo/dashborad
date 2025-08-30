@@ -1,6 +1,6 @@
 import 'package:dashboard/main.dart';
 import 'package:dio/dio.dart';
-// http://137.184.50.2/
+//  base  URL  http://137.184.50.2/
 class DashboardService {
   final Dio _dio = Dio();
 

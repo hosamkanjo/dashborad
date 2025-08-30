@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
             flex: 1,
             child: Container(
               padding: const EdgeInsets.all(20.0),
-              color: const Color(0xff4B70F5),
+              color: const Color.fromARGB(255,43,136, 236),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,

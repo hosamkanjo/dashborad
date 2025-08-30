@@ -778,8 +778,7 @@ class _AddStudentPageState extends State<Students> {
   String? selectedStage;
 
   final genders = ['Male', 'Female'];
-  
-  // قوائم ديناميكية من API
+
   List<Stage> stages = [];
   List<Classroom> classrooms = [];
   List<Section> sections = [];
