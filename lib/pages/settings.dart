@@ -54,64 +54,64 @@ class _SettingsPageState extends State<Settings> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildSectionTitle("Personal Information"),
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 4,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: pickImage,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: const Color(0xffe0e6f1),
-                        backgroundImage: selectedImage != null
-                            ? MemoryImage(selectedImage!)
-                            : null,
-                        child: selectedImage == null
-                            ? const Icon(Icons.camera_alt,
-                                size: 32, color: Colors.grey)
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Full Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.person),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Email Address',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.email),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff4B70F5),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 12),
-                      ),
-                      child: const Text('Save'),
-                    )
-                  ],
-                ),
-              ),
-            ),
+           // buildSectionTitle("Personal Information"),
+            // Card(
+            //   shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(16)),
+            //   elevation: 4,
+            //   child: Padding(
+            //     padding:
+            //         const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            //     child: Column(
+            //       children: [
+            //         GestureDetector(
+            //           onTap: pickImage,
+            //           child: CircleAvatar(
+            //             radius: 50,
+            //             backgroundColor: const Color(0xffe0e6f1),
+            //             backgroundImage: selectedImage != null
+            //                 ? MemoryImage(selectedImage!)
+            //                 : null,
+            //             child: selectedImage == null
+            //                 ? const Icon(Icons.camera_alt,
+            //                     size: 32, color: Colors.grey)
+            //                 : null,
+            //           ),
+            //         ),
+            //         const SizedBox(height: 20),
+            //         TextFormField(
+            //           decoration: InputDecoration(
+            //             hintText: 'Full Name',
+            //             border: OutlineInputBorder(
+            //               borderRadius: BorderRadius.circular(12),
+            //             ),
+            //             prefixIcon: const Icon(Icons.person),
+            //           ),
+            //         ),
+            //         const SizedBox(height: 16),
+            //         TextFormField(
+            //           decoration: InputDecoration(
+            //             hintText: 'Email Address',
+            //             border: OutlineInputBorder(
+            //               borderRadius: BorderRadius.circular(12),
+            //             ),
+            //             prefixIcon: const Icon(Icons.email),
+            //           ),
+            //         ),
+            //         const SizedBox(height: 16),
+            //         ElevatedButton(
+            //           onPressed: () {},
+            //           style: ElevatedButton.styleFrom(
+            //             backgroundColor: const Color(0xff4B70F5),
+            //             padding: const EdgeInsets.symmetric(
+            //                 horizontal: 40, vertical: 12),
+            //           ),
+            //           child: const Text('Save'),
+            //         )
+            //       ],
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 30),
             buildSectionTitle("Language Settings"),
             Card(

@@ -75,7 +75,7 @@ class SideBar extends StatelessWidget {
       ("Session year", Icons.calendar_today),
 
       // ("Permission Requests", Icons.check_circle),
-      // ("Settings", Icons.settings),
+      ("Settings", Icons.settings),
     ];
 
     return List.generate(menuItems.length, (index) {

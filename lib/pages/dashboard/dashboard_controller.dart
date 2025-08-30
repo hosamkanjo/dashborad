@@ -31,7 +31,7 @@ class DashboardController extends StatelessWidget {
       // const Activities(),
       // const PermissionRequest(),
       // const InstallmentsAndSalaries(),
-      // const Settings(),
+      const Settings(),
       const LogoutPage(),
     ];
 

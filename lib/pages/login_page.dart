@@ -124,8 +124,8 @@ class _LoginPageState extends State<LoginPage> {
         });
       },
       icon: _obscureText
-          ? const Icon(Icons.visibility)
-          : const Icon(Icons.visibility_off),
+          ? const Icon(Icons.visibility_off)
+          : const Icon(Icons.visibility),
     );
   }
 }
